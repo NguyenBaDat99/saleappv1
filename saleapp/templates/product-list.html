@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách sản phẩm</title>
+  <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
+ rel="stylesheet" />
+</head>
+<body>
+<!--    {{products}}-->
+  <h1>QUẢN LÝ SẢN PHẨM</h1>
+
+  <form action="{{ url_for('product_list') }}">
+    <div>
+      <input type="text" name="keyword" placeholder="Nhập từ khóa..." />
+    </div>
+    <div>
+      <input type="number" name="from_price" placeholder="Giá bắt đầu..." />
+      <input type="number" name="to_price" placeholder="Giá kết thúc..." />
+    </div>
+    <input type="submit" value="Tìm" />
+  </form>
+
+    <table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Tên sản phẩm</th>
+      <th scope="col">Thông số</th>
+      <th scope="col">Giá</th>
+        <th scope="col">Ảnh</th>
+        <th scope="col">Thao tác</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for product in products %}
+    <tr>
+        <th scope="row">{{product.id}}</th>
+      <td>{{product.name}}</td>
+        <td>{{product.description}}</td>
+        <td>{{product.price}}</td>
+        <td><img src="{{product.images}}" width="100px"/></td>
+        <td>Sửa | Xóa</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</body>
+</html>
