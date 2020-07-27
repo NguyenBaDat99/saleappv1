@@ -1,49 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Danh sách sản phẩm</title>
-  <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
- rel="stylesheet" />
-</head>
-<body>
+  <head>
+      <meta charset="UTF-8">
+      <title>Danh sách sản phẩm</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
+   rel="stylesheet" />
+  </head>
+  <body>
 <!--    {{products}}-->
-  <h1>QUẢN LÝ SẢN PHẨM</h1>
+  <div class="container">
+    <h1>QUẢN LÝ SẢN PHẨM</h1>
 
-  <form action="{{ url_for('product_list') }}">
-    <div>
-      <input type="text" name="keyword" placeholder="Nhập từ khóa..." />
-    </div>
-    <div>
-      <input type="number" name="from_price" placeholder="Giá bắt đầu..." />
-      <input type="number" name="to_price" placeholder="Giá kết thúc..." />
-    </div>
-    <input type="submit" value="Tìm" />
-  </form>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">Danh sách sản phẩm</a>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent" action="{{ url_for('product_list') }}">
+        <form class="form-inline my-2 my-lg-0">
+<!--          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">-->
+          <input type="text" name="keyword" placeholder="Nhập từ khóa..." class="form-control mr-sm-2"/>
+          <input type="number" name="from_price" placeholder="Giá bắt đầu..." class="form-control mr-sm-2"/>
+          <input type="number" name="to_price" placeholder="Giá kết thúc..." class="form-control mr-sm-2"/>
+<!--          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>-->
+          <input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Tìm" />
+        </form>
+      </div>
+    </nav>
+
+<!--    <form action="{{ url_for('product_list') }}">-->
+<!--      <div>-->
+<!--        <input type="text" name="keyword" placeholder="Nhập từ khóa..." />-->
+<!--      </div>-->
+<!--      <div>-->
+<!--        <input type="number" name="from_price" placeholder="Giá bắt đầu..." />-->
+<!--        <input type="number" name="to_price" placeholder="Giá kết thúc..." />-->
+<!--      </div>-->
+<!--      <input type="submit" value="Tìm" />-->
+<!--    </form>-->
 
     <table class="table table-striped">
-  <thead>
-    <tr>
-      <th scope="col">ID</th>
-      <th scope="col">Tên sản phẩm</th>
-      <th scope="col">Thông số</th>
-      <th scope="col">Giá</th>
+      <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Tên sản phẩm</th>
+        <th scope="col">Thông số</th>
+        <th scope="col">Giá</th>
         <th scope="col">Ảnh</th>
         <th scope="col">Thao tác</th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for product in products %}
-    <tr>
+      </tr>
+      </thead>
+      <tbody>
+      {% for product in products %}
+      <tr>
         <th scope="row">{{product.id}}</th>
-      <td>{{product.name}}</td>
+        <td>{{product.name}}</td>
         <td>{{product.description}}</td>
         <td>{{product.price}}</td>
         <td><img src="{{product.images}}" width="100px"/></td>
-        <td>Sửa | Xóa</td>
-    </tr>
-  {% endfor %}
-  </tbody>
-</table>
-</body>
+        <td>
+            <a href="{{ url_for('product_add', product_id = product.id)}}">Sửa</a>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <a class="btn btn-primary" href="{{ url_for('product_add'), product_id = None }}" role="button">Thêm sản phẩm</a>
+  </div>
+
+  </body>
 </html>
