@@ -24,8 +24,7 @@ def product_list_by_cate(category_id):
 def product_add():
     err_msg = None
     if request.method == "POST":
-
-        if request.args["product_id"]:
+        if request.args["product_id"] and int(request.args["product_id"]) > 0:
             p = dict(request.form.copy())
             p["id"] = request.args["product_id"]
 
@@ -41,7 +40,8 @@ def product_add():
 
     product = None
     if request.args["product_id"]:
-        product = dao.read_product_by_id(int(request.args["product_id"]))
+        if int(request.args["product_id"]) > 0:
+            product = dao.read_product_by_id(int(request.args["product_id"]))
 
     categories = dao.read_categories()
     return render_template("product-add.html", categories=categories, err_msg=err_msg, product=product)

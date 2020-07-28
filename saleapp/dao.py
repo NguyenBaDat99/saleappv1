@@ -2,17 +2,21 @@ from saleapp import app
 import json
 import os
 
+
 def read_products(keyword=None, from_price=None, to_price=None):
     with open(os.path.join(app.root_path, "data/products.json"), encoding="utf-8") as f:
         products = json.load(f)
     if keyword:
         return [product for product in read_products() if product["name"].lower().find(keyword.lower()) >= 0]
     if from_price and to_price:
-        return [product for product in read_products() if product["price"] >= from_price and product["price"] <= to_price]
+        return [product for product in read_products() if
+                from_price <= float(product["price"]) <= to_price]
     return products
+
 
 def read_products_by_cate_id(cate_id):
     return [product for product in read_products() if product["category_id"] == cate_id]
+
 
 def add_product(name, description, price, image, category):
     products = read_products()
@@ -49,16 +53,19 @@ def update_product(id, name, description, price, image, category):
             break
     return update_product_json(products)
 
+
 def read_product_by_id(id):
     products = read_products()
     for pro in products:
-        if(pro["id"] == id):
+        if (pro["id"] == id):
             return pro
     return None
+
 
 def read_categories():
     with open(os.path.join(app.root_path, "data/categories.json"), encoding="utf-8") as f:
         return json.load(f)
+
 
 if __name__ == "__main__":
     print(read_products())
