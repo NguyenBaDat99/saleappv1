@@ -1,10 +1,12 @@
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, send_file, jsonify, session
 from saleapp import app
-from saleapp import dao
+from saleapp import dao, utils, decorate
+
 
 @app.route("/")
 def index():
     return render_template("index.html")
+
 
 @app.route("/products")
 def product_list():
@@ -21,6 +23,7 @@ def product_list_by_cate(category_id):
 
 
 @app.route("/products/add", methods=["get", "post"])
+@decorate.login_required
 def product_add():
     err_msg = None
     if request.method == "POST":
@@ -45,6 +48,66 @@ def product_add():
 
     categories = dao.read_categories()
     return render_template("product-add.html", categories=categories, err_msg=err_msg, product=product)
+
+
+@app.route("/api/products/<int:product_id>", methods=["delete"])
+def delete_product(product_id):
+    if dao.delete_product(product_id=product_id):
+        return jsonify({"status": 200, "product_id": product_id})
+
+    return jsonify({"status": 500, "error_message": "Something Wrong!!!"})
+
+
+@app.route("/product/export")
+def export_product():
+    p = utils.export()
+
+    return send_file(filename_or_fp=p)
+
+
+@app.route("/login", methods=["get", "post"])
+def login():
+    err_msg = ""
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        user = dao.check_login(username=username, password=password)
+        if user:
+            session["user"] = user
+            if "next" in request.args:
+                return redirect(request.args["next"])
+            else:
+                return redirect(url_for('index'))
+        else:
+            err_msg = "Something wrong!!!"
+    return render_template("login.html", err_msg=err_msg)
+
+
+@app.route("/logout")
+def logout():
+    if "user" in session:
+        session["user"] = None
+    return redirect(url_for("index"))
+
+
+@app.route("/register",  methods=["get", "post"])
+def register():
+    if session.get("user"):
+        return redirect(request.url)
+    err_msg = ""
+    if request.method == "POST":
+        name = request.form.get("name")
+        username = request.form.get("username")
+        password = request.form.get("password")
+        confirm = request.form.get("confirm")
+        if password.strip() != confirm.strip():
+            err_msg = "Password wrong!!!"
+        else:
+            if dao.add_user(name=name, username=username, password=password):
+                return redirect(url_for("login"))
+            else:
+                err_msg = "Something wrong!!!"
+    return render_template("register.html", err_msg=err_msg)
 
 
 if __name__ == "__main__":

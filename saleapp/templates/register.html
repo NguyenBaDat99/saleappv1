@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
+   rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-success">REGISTER</h1>
+        {% if err_msg %}
+        <div class="alert alert-danger">
+            {{ err_msg }}
+        </div>
+        {% endif %}
+        <form method="post">
+            <div class="form-group">
+                <input type="text" placeholder="Name..." name="name" class="form-group" required/>
+            </div>
+            <div class="form-group">
+                <input type="text" placeholder="Username..." name="username" class="form-group" required/>
+            </div>
+            <div class="form-group">
+                <input type="password" placeholder="Password..." name="password" class="form-group"  required/>
+            </div>
+            <div class="form-group">
+                <input type="password" placeholder="Password confirm..." name="confirm" class="form-group"  required/>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Register" class="btn btn-info"/>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>

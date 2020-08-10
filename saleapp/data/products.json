@@ -25,22 +25,10 @@
     },
     {
         "id": 4,
-        "name": "fr432ff2",
-        "description": "s4325",
-        "price": "12321321.0",
-        "images": "sdf432",
-        "category_id": 1.0,
-        "image": "",
-        "category": "1"
-    },
-    {
-        "id": 5,
-        "name": "adsfasdf",
-        "description": "`",
-        "price": "12343124.0",
-        "images": "sdfsdf",
-        "category_id": 1,
-        "image": "",
-        "category": "1"
+        "name": "Thực phẩm",
+        "description": "",
+        "price": 28.0,
+        "images": "fsdfsdfds",
+        "category_id": 1
     }
 ]
