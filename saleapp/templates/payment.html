@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
+   rel="stylesheet" />
+    <title>Thanh toán</title>
+</head>
+<body>
+    <div class="container">
+        <table class="table">
+            <tr>
+                <td>ID</td>
+                <td>Tên sản phẩm</td>
+                <td>Giá</td>
+                <td>Số lượng</td>
+            </tr>
+            {% for c in session["cart"].values() %}
+            <tr>
+                <td>{{c.id}}</td>
+                <td>{{c.name}}</td>
+                <td>{{c.price}}</td>
+                <td>{{c.quantity}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+</body>
+</html>

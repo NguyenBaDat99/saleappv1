@@ -18,12 +18,28 @@
 
             });
         }
+        function addToCart(id, name, price){
+            fetch("/api/cart", {
+                body: JSON.stringify({
+                   "product_id": id,
+                   "name": name,
+                   "price": price
+                }),
+                method: "post",
+                headers: {"Content-Type": "application/json"}
+            }).then(res => res.json()).then(data => {
+                var cart = document.getElementById("cartId");
+                cart.innerText = `${data.quantity}`;
+                console.info(data)
+            })
+        }
+
     </script>
   </head>
   <body>
 <!--    {{products}}-->
   <div class="container">
-    <h1>QUẢN LÝ SẢN PHẨM</h1>
+<!--    <h1>QUẢN LÝ SẢN PHẨM</h1>-->
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <a class="navbar-brand" href="#">Danh sách sản phẩm</a>
@@ -50,15 +66,18 @@
 <!--      <input type="submit" value="Tìm" />-->
 <!--    </form>-->
 
+      <div>
+          <a href="{{ url_for('cart') }}">Giỏ hàng</a> <span class="badge badge-dark" id="cartId">0</span>
+      </div>
     <table class="table table">
       <thead>
       <tr>
         <th scope="col">ID</th>
         <th scope="col">Tên sản phẩm</th>
-        <th scope="col">Thông số</th>
-        <th scope="col">Giá</th>
+        <th scope="col">Thông số
         <th scope="col">Ảnh</th>
-        <th scope="col">Thao tác</th>
+        <th scope="col">Thao tác</th></th>
+        <th scope="col">Giá</th>
       </tr>
       </thead>
       <tbody>
@@ -70,7 +89,8 @@
         <td>{{product.price}}</td>
         <td><img src="{{product.images}}" width="100px"/></td>
         <td>
-            <a href="{{ url_for('product_add', product_id = product.id)}}">Sửa</a>
+            <a href="javascript:;" onclick="addToCart({{ product.id }}, '{{ product.name }}', {{ product.price }})"> Thêm giỏ hàng</a> |
+            <a href="{{ url_for('product_add', product_id = product.id)}}">Sửa</a> |
             <a href="javascript:;" onclick="delPro({{product.id}})">Xóa</a>
         </td>
       </tr>
