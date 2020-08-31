@@ -1,7 +1,7 @@
 [{
- "id": 1,
- "name": "Mobile"
+  "id": 1,
+  "name": "Mobile"
 }, {
- "id": 2,
- "name": "Tablet"
+  "id": 2,
+  "name": "Tablet"
 }]

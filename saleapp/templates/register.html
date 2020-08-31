@@ -1,37 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Register</title>
-    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
-   rel="stylesheet" />
-</head>
-<body>
+{% extends 'base/base.html' %}
+
+{% block body %}
     <div class="container">
-        <h1 class="text-success">REGISTER</h1>
+        <h1 class="text-center text-success">DANG KY TAI KHOAN</h1>
         {% if err_msg %}
         <div class="alert alert-danger">
-            {{ err_msg }}
+            <h1>{{ err_msg }}</h1>
         </div>
         {% endif %}
         <form method="post">
             <div class="form-group">
-                <input type="text" placeholder="Name..." name="name" class="form-group" required/>
+                <input type="text" placeholder="Name..."
+                       name="name" class="form-control" required />
             </div>
             <div class="form-group">
-                <input type="text" placeholder="Username..." name="username" class="form-group" required/>
+                <input type="text" placeholder="Username..."
+                       name="username" class="form-control" required />
             </div>
             <div class="form-group">
-                <input type="password" placeholder="Password..." name="password" class="form-group"  required/>
+                <input type="password" placeholder="Password..."
+                       name="password" class="form-control" required />
             </div>
             <div class="form-group">
-                <input type="password" placeholder="Password confirm..." name="confirm" class="form-group"  required/>
+                <input type="password" placeholder="Xac nhan mat khau..."
+                       name="confirm" class="form-control" required />
             </div>
             <div class="form-group">
-                <input type="submit" value="Register" class="btn btn-info"/>
+                <input type="submit" value="Dang ky"
+                       class="btn btn-danger" />
             </div>
         </form>
     </div>
 
-</body>
-</html>
+{% endblock %}

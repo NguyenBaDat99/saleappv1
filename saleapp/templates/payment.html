@@ -1,30 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
-   rel="stylesheet" />
-    <title>Thanh toán</title>
-</head>
-<body>
-    <div class="container">
-        <table class="table">
-            <tr>
-                <td>ID</td>
-                <td>Tên sản phẩm</td>
-                <td>Giá</td>
-                <td>Số lượng</td>
-            </tr>
+{% extends 'base/base.html' %}
+
+{% block body %}
+<div class="container">
+    <h1 class="text-center text-info">GIO HANG</h1>
+
+    {% if err_msg %}
+    <div class="alert alert-danger">
+        {{ err_msg }}
+    </div>
+    {% endif %}
+
+    <table class="table">
+        <tr>
+            <th scope="col">Tên sản phẩm</th>
+            <th scope="col">Giá</th>
+            <th scope="col">Số lượng</th>
+        </tr>
+        {% if session['cart'] %}
             {% for c in session["cart"].values() %}
             <tr>
-                <td>{{c.id}}</td>
-                <td>{{c.name}}</td>
-                <td>{{c.price}}</td>
-                <td>{{c.quantity}}</td>
+                <td>{{ c.name }}</td>
+                <td>{{ c.price }}</td>
+                <td>{{ c.quantity }}</td>
             </tr>
             {% endfor %}
-        </table>
-    </div>
+        {% else %}
+            <tr>
+                <td colspan="3"> No product</td>
+            </tr>
+        {% endif %}
+        <tr>
+            <td colspan="3">
+                <form action="{{ url_for('cart') }}" method="post">
+                    <input type="submit" value="Thanh toan" class="btn btn-danger"/>
+                </form>
 
-</body>
-</html>
+            </td>
+        </tr>
+    </table>
+</div>
+{% endblock body %}

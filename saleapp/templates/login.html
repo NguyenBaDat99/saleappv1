@@ -1,26 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
-   rel="stylesheet" />
-</head>
-<body>
+{% extends 'base/base.html' %}
+
+{% block body %}
     <div class="container">
-        <h1 class="text-success">LOGIN</h1>
+        <h1 class="text-center text-success">LOGIN</h1>
         <form method="post">
             <div class="form-group">
-                <input type="text" placeholder="Username..." name="username" class="form-group" />
+                <input type="text" placeholder="Username..."
+                       name="username" class="form-control" />
             </div>
             <div class="form-group">
-                <input type="password" placeholder="Password..." name="password" class="form-group" />
+                <input type="password" placeholder="Password..."
+                       name="password" class="form-control" />
             </div>
             <div class="form-group">
-                <input type="submit" value="Login" class="btn btn-info"/>
+                <input type="submit" value="Login"
+                       class="btn btn-danger" />
             </div>
         </form>
     </div>
 
-</body>
-</html>
+
+{% endblock %}

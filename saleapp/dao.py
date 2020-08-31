@@ -1,57 +1,55 @@
-from saleapp import app
+from saleapp import app, db
+from saleapp.models import Category, Product, ReceiptDetail, Receipt, User
+from functools import wraps
 import json
 import os
 import hashlib
 
 
 def read_products(keyword=None, from_price=None, to_price=None):
-    with open(os.path.join(app.root_path, "data/products.json"), encoding="utf-8") as f:
-        products = json.load(f)
+    products = Product.query
+
     if keyword:
-        return [product for product in read_products() if product["name"].lower().find(keyword.lower()) >= 0]
+        products = products.filter(Product.name.contains(keyword))
+
     if from_price and to_price:
-        return [product for product in read_products() if
-                from_price <= float(product["price"]) <= to_price]
-    return products
+        products = products.filter(Product.price.__gt__(from_price), Product.price.__lt__(to_price))
+
+    return products.all()
 
 
-def read_products_by_cate_id(cate_id):
-    return [product for product in read_products() if product["category_id"] == cate_id]
-
-
-def add_product(name, description, price, image, category):
+def read_product_by_id(product_id):
     products = read_products()
-    products.append({
-        "id": len(products) + 1,
-        "name": name,
-        "description": description,
-        "price": float(price),
-        "images": image,
-        "category_id": int(category)
-    })
+    for p in products:
+        if p["id"] == product_id:
+            return p
+
+    return None
+
+
+def del_product(product_id):
+    products = read_products()
+
+    for idx, p in enumerate(products):
+        if p["id"] == product_id:
+            del products[idx]
+            break
+
     return update_product_json(products)
 
 
-def update_product_json(products):
-    try:
-        f = open(os.path.join(app.root_path, "data/products.json"), "w", encoding="utf-8")
-        json.dump(products, f, ensure_ascii=False, indent=4)
-        return True
-    except Exception as ex:
-        print(ex)
-        return False
-
-
-def update_product(id, name, description, price, image, category):
+def update_product(product_id, name, description, price, image, category):
     products = read_products()
-    for pro in products:
-        if pro["id"] == int(id):
-            pro["name"] = name
-            pro["description"] = description
-            pro["price"] = price
-            pro["image"] = image
-            pro["category"] = category
+    for p in products:
+        if p["id"] == int(product_id):
+            p["name"] = name
+            p["description"] = description
+            p["price"] = float(price)
+            p["image"] = image
+            p["category_id"] = int(category)
+
             break
+
     return update_product_json(products)
 
 
@@ -65,47 +63,78 @@ def delete_product(product_id):
     return update_product_json(products)
 
 
-def read_product_by_id(id):
+def add_product(name, description, price, image, category):
     products = read_products()
-    for pro in products:
-        if pro["id"] == id:
-            return pro
-    return None
+    products.append({
+        "id": len(products) + 1,
+        "name": name,
+        "description": description,
+        "price": float(price),
+        "image": image,
+        "category_id": int(category)
+    })
+
+    return update_product_json(products)
+
+
+def update_product_json(products):
+    try:
+        with open(os.path.join(app.root_path, "data/products.json"), "w", encoding="utf-8") as f:
+            json.dump(products, f, ensure_ascii=False, indent=4)
+
+        return True
+    except Exception as ex:
+        print(ex)
+        return False
 
 
 def read_categories():
-    with open(os.path.join(app.root_path, "data/categories.json"), encoding="utf-8") as f:
-        return json.load(f)
+    return Category.query.all()
+
+
+def read_products_by_cate_id(cate_id):
+    return Category.query.get(cate_id).products
 
 
 def load_users():
-    with open(os.path.join(app.root_path, "data/user.json"), encoding="utf-8") as f:
+    with open(os.path.join(app.root_path, "data/users.json"), encoding="utf-8") as f:
         return json.load(f)
 
 
 def add_user(name, username, password):
-    users = load_users()
-    user = {
-        "id": len(users) + 1,
-        "name": name.strip(),
-        "username": username.strip(),
-        "password": hashlib.md5(password.strip().encode("utf-8")).hexdigest()
-    }
-    users.append(user)
-    with open(os.path.join(app.root_path, "data/user.json"), "w", encoding="utf-8") as f:
-        json.dump(users, f, ensure_ascii=False, indent=4)
+    user = User(name=name,
+                username=username,
+                password=hashlib.md5(password.encode('utf-8')).hexdigest())
+    db.session.add(user)
+    db.session.commit()
 
     return user
 
-
 def check_login(username, password):
-    users = load_users()
-    password = str(hashlib.md5(password.encode("utf-8")).hexdigest())
-    for u in users:
-        if u["username"].strip() == username.strip() and u["password"] == password:
-            return u
-    return None
+    password = str(hashlib.md5(password.strip().encode("utf-8")).hexdigest())
+    return User.query.filter(User.username == username,
+                             User.password == password).first()
 
+
+def add_receipt(cart_product):
+    try:
+        r = Receipt()
+        db.session.add(r)
+        db.session.commit()
+
+        for p in cart_product:
+            d = ReceiptDetail(product_id=p["id"], receipt_id=r.id, quantity=p["quantity"], unit_price=p["price"])
+            db.session.add(d)
+
+        db.session.commit()
+        return True
+    except Exception as ex:
+        print(ex)
+        return False
+
+
+def get_user_by_id(user_id):
+    return User.query.get(user_id)
 
 if __name__ == "__main__":
     print(read_products())

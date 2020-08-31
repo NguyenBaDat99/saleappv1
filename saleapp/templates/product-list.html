@@ -1,11 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <title>Danh sách sản phẩm</title>
-    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
-   rel="stylesheet" />
-      <script>
+{% extends 'base/base.html' %}
+
+{% block scripts %}
+    <script>
+        function delProduct(productId) {
+            fetch("/api/pro/" + productId, {
+                "method": "delete"
+            }).then(res => res.json()).then(res => {
+                if (res.status == 200) {
+                    var d = document.getElementById("product" + res.product_id);
+                    d.style.display = "None";
+                }
+            }).catch(function(err) {
+
+            })
+        }
+
         function delPro(productId) {
             fetch("/api/products/" + productId, {
                 "method": "delete"
@@ -14,93 +23,106 @@
                     var d = document.getElementById("product" + res.product_id);
                     d.style.display = "None";
                 }
-            }).catch(function (err) {
-
             });
         }
-        function addToCart(id, name, price){
+
+        function addToCart(id, name, price) {
             fetch("/api/cart", {
                 body: JSON.stringify({
-                   "product_id": id,
-                   "name": name,
-                   "price": price
+                    "product_id": id,
+                    "name": name,
+                    "price": price
                 }),
                 method: "post",
                 headers: {"Content-Type": "application/json"}
             }).then(res => res.json()).then(data => {
                 var cart = document.getElementById("cartId");
                 cart.innerText = `${data.quantity}`;
-                console.info(data)
+            })
+        }
+
+        function init(){
+             fetch("/api/cart", {
+                method: "get",
+                headers: {"Content-Type": "application/json"}
+            }).then(res => res.json()).then(data => {
+                var cart = document.getElementById("cartId");
+                cart.innerText = `${data.quantity}`;
             })
         }
 
     </script>
-  </head>
-  <body>
+{% endblock %}
+
+{% block body %}
+<body onload="init()">
 <!--    {{products}}-->
-  <div class="container">
-<!--    <h1>QUẢN LÝ SẢN PHẨM</h1>-->
+<div class="container">
+    <!--    <h1>QUẢN LÝ SẢN PHẨM</h1>-->
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">Danh sách sản phẩm</a>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent" action="{{ url_for('product_list') }}">
-        <form class="form-inline my-2 my-lg-0">
-<!--          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">-->
-          <input type="text" name="keyword" placeholder="Nhập từ khóa..." class="form-control mr-sm-2"/>
-          <input type="number" name="from_price" placeholder="Giá bắt đầu..." class="form-control mr-sm-2"/>
-          <input type="number" name="to_price" placeholder="Giá kết thúc..." class="form-control mr-sm-2"/>
-<!--          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>-->
-          <input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Tìm" />
-        </form>
-      </div>
+        <a class="navbar-brand" href="#">Danh sách sản phẩm</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent" action="{{ url_for('product_list') }}">
+            <form class="form-inline my-2 my-lg-0">
+                <!--          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">-->
+                <input type="text" name="keyword" placeholder="Nhập từ khóa..." class="form-control mr-sm-2"/>
+                <input type="number" name="from_price" placeholder="Giá bắt đầu..." class="form-control mr-sm-2"/>
+                <input type="number" name="to_price" placeholder="Giá kết thúc..." class="form-control mr-sm-2"/>
+                <!--          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>-->
+                <input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Tìm"/>
+            </form>
+        </div>
     </nav>
 
-<!--    <form action="{{ url_for('product_list') }}">-->
-<!--      <div>-->
-<!--        <input type="text" name="keyword" placeholder="Nhập từ khóa..." />-->
-<!--      </div>-->
-<!--      <div>-->
-<!--        <input type="number" name="from_price" placeholder="Giá bắt đầu..." />-->
-<!--        <input type="number" name="to_price" placeholder="Giá kết thúc..." />-->
-<!--      </div>-->
-<!--      <input type="submit" value="Tìm" />-->
-<!--    </form>-->
+    <!--    <form action="{{ url_for('product_list') }}">-->
+    <!--      <div>-->
+    <!--        <input type="text" name="keyword" placeholder="Nhập từ khóa..." />-->
+    <!--      </div>-->
+    <!--      <div>-->
+    <!--        <input type="number" name="from_price" placeholder="Giá bắt đầu..." />-->
+    <!--        <input type="number" name="to_price" placeholder="Giá kết thúc..." />-->
+    <!--      </div>-->
+    <!--      <input type="submit" value="Tìm" />-->
+    <!--    </form>-->
 
-      <div>
-          <a href="{{ url_for('cart') }}">Giỏ hàng</a> <span class="badge badge-dark" id="cartId">0</span>
-      </div>
+    <div>
+        <a href="{{ url_for('cart') }}">Giỏ hàng</a> <span class="badge badge-dark" id="cartId">{{ cart_quantity }}</span>
+    </div>
     <table class="table table">
-      <thead>
-      <tr>
-        <th scope="col">ID</th>
-        <th scope="col">Tên sản phẩm</th>
-        <th scope="col">Thông số
-        <th scope="col">Ảnh</th>
-        <th scope="col">Thao tác</th></th>
-        <th scope="col">Giá</th>
-      </tr>
-      </thead>
-      <tbody>
-      {% for product in products %}
-      <tr class="{% if request.args['product_id']==product.id|string %}table-info{% endif %}" id="product{{product.id}}">
-        <th scope="row">{{product.id}}</th>
-        <td>{{product.name}}</td>
-        <td>{{product.description}}</td>
-        <td>{{product.price}}</td>
-        <td><img src="{{product.images}}" width="100px"/></td>
-        <td>
-            <a href="javascript:;" onclick="addToCart({{ product.id }}, '{{ product.name }}', {{ product.price }})"> Thêm giỏ hàng</a> |
-            <a href="{{ url_for('product_add', product_id = product.id)}}">Sửa</a> |
-            <a href="javascript:;" onclick="delPro({{product.id}})">Xóa</a>
-        </td>
-      </tr>
-      {% endfor %}
-      </tbody>
+        <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Tên sản phẩm</th>
+            <th scope="col">Thông số</th>
+            <th scope="col">Giá</th>
+            <th scope="col">Ảnh</th>
+            <th scope="col">Thao tác</th>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for product in products %}
+        <tr class="{% if request.args['product_id']==product.id|string %}table-info{% endif %}"
+            id="product{{product.id}}">
+            <th scope="row">{{product.id}}</th>
+            <td>{{product.name}}</td>
+            <td>{{product.description}}</td>
+            <td> {{ "{:,.1f}".format(product.price) }} VNĐ</td>
+            <td><img src="{{product.image}}" width="100px"/></td>
+            <td>
+                <a href="javascript:;" onclick="addToCart({{ product.id }}, '{{ product.name }}', {{ product.price }})">
+                    Thêm giỏ hàng</a> |
+                <a href="{{ url_for('add_product', product_id = product.id)}}">Sửa</a> |
+                <a href="javascript:;" onclick="delPro({{product.id}})">Xóa</a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
     </table>
-    <a class="btn btn-success" href="{{ url_for('product_add', product_id = -1) }}" role="button">Thêm sản phẩm</a>
+    <a class="btn btn-success" href="{{ url_for('add_product', product_id = -1) }}" role="button">Thêm sản phẩm</a>
     <a href="{{ url_for('export_product') }}">Xuất danh sách sản phẩm</a>
-  </div>
+</div>
+</body>
+<br>
 
-
-  </body>
-</html>
+{% endblock %}
